@@ -7,6 +7,7 @@ import 'package:newmelon/analyze.dart';
 import 'package:newmelon/summary.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
 class NewPeriod extends StatefulWidget {
   const NewPeriod({Key? key}) : super(key: key);
@@ -17,35 +18,72 @@ class NewPeriod extends StatefulWidget {
 
 class _NewPeriodState extends State<NewPeriod> {
   List greenhouse = [];
+  String? selectval;
 
-  String? greenhouseName;
-  String? greenhouseId;
 
+
+
+
+  //GET REGISTERED GREENHOUSE
+  Future RegisterPeriod() async {
+    var url = "https://meloned.relaxlikes.com/api/period/insert_period.php";
+
+    var response = await http.post(Uri.parse(url), body: {
+      'greenhouse_ID': selectval,
+    });
+
+    var jsonData = json.decode(response.body);
+    print(jsonData);
+
+    if (jsonData == "Fail") {
+      Fluttertoast.showToast(
+        msg: "ล้มเหลว",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
+        fontSize: 16.0,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "สำเร็จ",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
+        fontSize: 16.0,
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  //GET GREENHOUSE
   Future getGreenHouse() async {
     var url =
         "https://meloned.relaxlikes.com/api/greenhouse/viewgreenhouse.php";
+
     var response = await http.get(Uri.parse(url));
-    greenhouse = json.decode(response.body);
+    // greenhouse = json.decode(response.body);
     // return json.decode(response.body);
-    // return greenhouse;
-    // var jsonBody = response.body;
-    // var jsonData = json.decode(jsonBody);
 
-    // setState(() {
-    //   greenhouse = jsonData;
+    var jsonData = json.decode(response.body);
 
-    // });
-    // print(jsonData);
-
-    print(greenhouse);
+    setState(() {
+      greenhouse = jsonData;
+    });
+    return greenhouse;
   }
 
   @override
   void initState() {
     super.initState();
     getGreenHouse();
+    super.initState();
   }
 
+  
   @override
   Widget build(BuildContext context) {
     double screen_width = MediaQuery.of(context).size.width;
@@ -103,39 +141,34 @@ class _NewPeriodState extends State<NewPeriod> {
                   height: 10,
                 ),
                 Container(
-                    color: Color.fromRGBO(251, 249, 218, 1),
-                    height: 50,
-                    //////////////////////////////////////////////////////////////////
-                    //////////////////////////////////////////////////////////////////
-                    /*____________________Dropdown เลือกโรงเรือน_______________________*/
-                    //////////////////////////////////////////////////////////////////
-                    //////////////////////////////////////////////////////////////////
-                    ///
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: greenhouseName,
-                      icon: Icon(Icons.arrow_drop_down),
-                      iconSize: 24,
-                      elevation: 16,
-                      hint: Text('เลือกโรงเรือน',
-                          style: GoogleFonts.kanit(
-                              fontSize: 18,
-                              color: Color.fromRGBO(116, 116, 39, 1))),
-                      style: TextStyle(
-                          color: Color.fromRGBO(116, 116, 39, 1), fontSize: 18),
-                      onChanged: (value) {
-                        setState(() {
-                                greenhouseName = value;
-                                print(greenhouseName);
-                        });
-                      },
-                      items: greenhouse.map((item) {
-                          return DropdownMenuItem<String>(
-                          value: item['greenhouse_ID'].toString(),
-                          child: Text(item['greenhouse_Name'].toString()),
-                        );
-                      }).toList(),
-                    )),
+                  color: Color.fromRGBO(251, 249, 218, 1),
+                  height: 50,
+                  //////////////////////////////////////////////////////////////////
+                  //////////////////////////////////////////////////////////////////
+                  /*____________________Dropdown เลือกโรงเรือน_______________________*/
+                  //////////////////////////////////////////////////////////////////
+                  //////////////////////////////////////////////////////////////////
+                  ///
+
+                  child: DropdownButton(
+                    isExpanded: true,
+                    items: greenhouse.map((item) {
+                      return new DropdownMenuItem(
+                        child: new Text(
+                          item['greenhouse_Name'],
+                          style: GoogleFonts.kanit(),
+                        ),
+                        value: item['greenhouse_ID'].toString(),
+                      );
+                    }).toList(),
+                    onChanged: (newVal) {
+                      setState(() {
+                        selectval = newVal as String;
+                      });
+                    },
+                    value: selectval,
+                  ),
+                ),
                 SizedBox(
                   height: 10,
                 ),
@@ -147,7 +180,9 @@ class _NewPeriodState extends State<NewPeriod> {
                         ////////////////////////////////////////////////
                         //ปุ่มบันทึก
                         ////////////////////////////////////////////////
-                        onPressed: () {},
+                        onPressed: () {
+                          RegisterPeriod();
+                        },
                         child: Text(
                           'บันทึก',
                           style: TextStyle(
@@ -168,7 +203,10 @@ class _NewPeriodState extends State<NewPeriod> {
                         ////////////////////////////////////////////
                         //ปุ่มยกเลิก
                         /////////////////////////////////////////////
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
                         child: Text(
                           'ยกเลิก',
                           style: TextStyle(
