@@ -45,7 +45,10 @@ class _PeriodState extends State<Period> {
 
   Future getPeriod() async {
     var url = "https://meloned.relaxlikes.com/api/period/viewperiod.php";
-    var response = await http.get(Uri.parse(url));
+    var response = await http.get(Uri.parse(url),headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    });
     return json.decode(response.body);
   }
 

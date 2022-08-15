@@ -45,7 +45,7 @@ class _EditPeriodState extends State<EditPeriod> {
     try {
       String url = "https://meloned.relaxlikes.com/api/period/deleteperiod.php";
       var response = await http.post(Uri.parse(url), body: {
-        'period_ID': period_ID,
+        'period_ID': widget.list[widget.index]['period_ID'],
       });
       var data = json.decode(response.body);
       // print(data);
@@ -60,10 +60,11 @@ class _EditPeriodState extends State<EditPeriod> {
           fontSize: 16.0,
         );
         // getdata();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Period()),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => Period()),
+        // );
+        Navigator.pop(context);
         setState(() {});
       } else {
         Fluttertoast.showToast(
@@ -146,7 +147,11 @@ class _EditPeriodState extends State<EditPeriod> {
               /*____________________ลบรอบการปลูก_______________________*/
               //////////////////////////////////////////////////////////
               //////////////////////////////////////////////////////////
-              
+              setState(() {
+                print(widget.list[widget.index]['period_ID']);
+                deletePeriod(widget.list[widget.index]['period_ID']);
+                
+              });
             },
             icon: Icon(
               Icons.delete_outline,
@@ -322,7 +327,7 @@ class _EditPeriodState extends State<EditPeriod> {
                       ////////////////////////////////////////////////////////////////////
                       ////////////////////////////////////////////////////////////////////
                       onPressed: () {
-                        print(widget.list[widget.index]['period_ID']);
+                        
                         setState(() {
                           FinishPeriod();
 
