@@ -27,51 +27,28 @@ class _PeriodState extends State<Period> {
   //   'โรงเรือน 3',
   // ];
 
-  // Future editpreiod (String greenhouse, String username, String password) async {
-  //   try {
-  //     String url = "https://meloned.relaxlikes.com/api/editprofile.php";
-  //     var response = await http.post(Uri.parse(url), body: {
-  //       'farmer_ID': farmer_ID,
-  //       'username': username,
-  //       'password': password,
-  //     });
-  //     var data = json.decode(response.body);
-  //     print(data);
-  //     if (data == "Success") {
-  //       Fluttertoast.showToast(
-  //         msg: "แก้ไขข้อมูลสำเร็จ",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         gravity: ToastGravity.BOTTOM,
-  //         timeInSecForIosWeb: 1,
-  //         backgroundColor: Colors.white,
-  //         textColor: Colors.black,
-  //         fontSize: 16.0,
-  //       );
-  //       // getdata();
-  //       // Navigator.push(
-  //       //   context,
-  //       //   MaterialPageRoute(builder: (context) => DeleteProfileScreen()),
-  //       // );
-  //       setState(() {});
-  //     } else {
-  //       Fluttertoast.showToast(
-  //         msg: "แก้ไขข้อมูลไม่สำเร็จ",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         gravity: ToastGravity.BOTTOM,
-  //         timeInSecForIosWeb: 1,
-  //         backgroundColor: Colors.white,
-  //         textColor: Colors.black,
-  //         fontSize: 16.0,
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  Future detailpreiod(String period_ID, String create_date, String harvest_date,
+      String greenhouse_ID) async {
+    try {
+      String url = "https://meloned.relaxlikes.com/api/period/viewperiod.php";
+      var response = await http.post(Uri.parse(url), body: {
+        'period_ID': period_ID,
+        'create_date': create_date,
+        'harvest_date': harvest_date,
+        'greenhouse_ID': greenhouse_ID,
+      });
+      var data = json.decode(response.body);
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future getPeriod() async {
     var url = "https://meloned.relaxlikes.com/api/period/viewperiod.php";
-    var response = await http.get(Uri.parse(url));
+    var response = await http.get(Uri.parse(url),headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    });
     return json.decode(response.body);
   }
 
@@ -109,7 +86,6 @@ class _PeriodState extends State<Period> {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              navigator:
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NewPeriod()),
@@ -194,6 +170,7 @@ class _PeriodState extends State<Period> {
                             child: ListView.builder(
                               itemCount: snapshot.data.length,
                               itemBuilder: (BuildContext context, int index) {
+                                List list = snapshot.data;
                                 return Card(
                                   color: Color.fromRGBO(253, 212, 176, 1),
                                   clipBehavior: Clip.antiAlias,
@@ -210,16 +187,29 @@ class _PeriodState extends State<Period> {
                                               snapshot.data[index]
                                                   ['create_date'],
                                           style: GoogleFonts.kanit(),
+                                          
                                         ),
                                         trailing: IconButton(
                                           icon: Icon(Icons.settings),
                                           onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EditPeriod()),
+                                            detailpreiod(
+                                              snapshot.data[index]['period_ID'],
+                                              snapshot.data[index]
+                                                  ['create_date'],
+                                              snapshot.data[index]
+                                                  ['harvest_date'],
+                                              snapshot.data[index]
+                                                  ['greenhouse_ID'],
                                             );
+
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        EditPeriod(
+                                                          list: list,
+                                                          index: index,
+                                                        )));
                                           },
                                         ),
                                       ),
